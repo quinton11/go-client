@@ -8,7 +8,7 @@ import (
 	"crypto/rand"
 	"io"
 
-	"github.com/quinton11/go-infisical/models"
+	"github.com/quinton11/go-client/models"
 
 	"golang.org/x/crypto/nacl/box"
 )

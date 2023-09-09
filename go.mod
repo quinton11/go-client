@@ -1,4 +1,4 @@
-module github.com/quinton11/go-infisical
+module github.com/quinton11/go-client
 
 go 1.20
 

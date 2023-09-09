@@ -1,7 +1,7 @@
 package client
 
 import (
-	"github.com/quinton11/go-infisical/models"
+	"github.com/quinton11/go-client/models"
 
 	"fmt"
 
