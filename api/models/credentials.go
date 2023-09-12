@@ -4,11 +4,6 @@ package models
 
 import "time"
 
-type ApiConfig struct {
-	UserAgent  string `json:"userAgent"`
-	HostApiUrl string `json:"hostApiUrl"`
-}
-
 type GetLoginOneV2Request struct {
 	Email           string `json:"email"`
 	ClientPublicKey string `json:"clientPublicKey"`

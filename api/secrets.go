@@ -1,7 +1,7 @@
 package client
 
 import (
-	"github.com/quinton11/go-client/models"
+	"github.com/quinton11/go-client/api/models"
 
 	"fmt"
 
@@ -9,13 +9,13 @@ import (
 )
 
 // Terraform, CLI, k8
-func GetSecretsV3(httpClient *resty.Client, request models.GetEncryptedSecretsV3Request, config models.ApiConfig) (models.GetEncryptedSecretsV3Response, error) {
+func (c *ClientConfig) GetSecretsV3(httpClient *resty.Client, request models.GetEncryptedSecretsV3Request) (models.GetEncryptedSecretsV3Response, error) {
 	var secretsResponse models.GetEncryptedSecretsV3Response
 
 	httpRequest := httpClient.
 		R().
 		SetResult(&secretsResponse).
-		SetHeader("User-Agent", config.UserAgent).
+		SetHeader("User-Agent", c.UserAgent).
 		SetQueryParam("environment", request.Environment).
 		SetQueryParam("workspaceId", request.WorkspaceId)
 
@@ -31,7 +31,7 @@ func GetSecretsV3(httpClient *resty.Client, request models.GetEncryptedSecretsV3
 		httpRequest.SetQueryParam("secretPath", request.SecretPath)
 	}
 
-	response, err := httpRequest.Get(fmt.Sprintf("%v/v3/secrets", config.HostApiUrl))
+	response, err := httpRequest.Get(fmt.Sprintf("%v/v3/secrets", c.BaseUrl))
 
 	if err != nil {
 		return models.GetEncryptedSecretsV3Response{}, fmt.Errorf("CallGetSecretsV3: Unable to complete api request [err=%s]", err)
@@ -48,14 +48,14 @@ func GetSecretsV3(httpClient *resty.Client, request models.GetEncryptedSecretsV3
 	return secretsResponse, nil
 }
 
-func CreateSecretsV3(httpClient *resty.Client, request models.CreateSecretV3Request, config models.ApiConfig) error {
+func (c *ClientConfig) CreateSecretsV3(httpClient *resty.Client, request models.CreateSecretV3Request) error {
 	var secretsResponse models.GetEncryptedSecretsV3Response
 	response, err := httpClient.
 		R().
 		SetResult(&secretsResponse).
-		SetHeader("User-Agent", config.UserAgent).
+		SetHeader("User-Agent", c.UserAgent).
 		SetBody(request).
-		Post(fmt.Sprintf("%v/v3/secrets/%s", config.HostApiUrl, request.SecretName))
+		Post(fmt.Sprintf("%v/v3/secrets/%s", c.BaseUrl, request.SecretName))
 
 	if err != nil {
 		return fmt.Errorf("CallCreateSecretsV3: Unable to complete api request [err=%s]", err)
@@ -68,14 +68,14 @@ func CreateSecretsV3(httpClient *resty.Client, request models.CreateSecretV3Requ
 	return nil
 }
 
-func DeleteSecretsV3(httpClient *resty.Client, request models.DeleteSecretV3Request, config models.ApiConfig) error {
+func (c *ClientConfig) DeleteSecretsV3(httpClient *resty.Client, request models.DeleteSecretV3Request) error {
 	var secretsResponse models.GetEncryptedSecretsV3Response
 	response, err := httpClient.
 		R().
 		SetResult(&secretsResponse).
-		SetHeader("User-Agent", config.UserAgent).
+		SetHeader("User-Agent", c.UserAgent).
 		SetBody(request).
-		Delete(fmt.Sprintf("%v/v3/secrets/%s", config.HostApiUrl, request.SecretName))
+		Delete(fmt.Sprintf("%v/v3/secrets/%s", c.BaseUrl, request.SecretName))
 
 	if err != nil {
 		return fmt.Errorf("CallDeleteSecretsV3: Unable to complete api request [err=%s]", err)
@@ -88,14 +88,14 @@ func DeleteSecretsV3(httpClient *resty.Client, request models.DeleteSecretV3Requ
 	return nil
 }
 
-func UpdateSecretsV3(httpClient *resty.Client, request models.UpdateSecretByNameV3Request, config models.ApiConfig) error {
+func (c *ClientConfig) UpdateSecretsV3(httpClient *resty.Client, request models.UpdateSecretByNameV3Request) error {
 	var secretsResponse models.GetEncryptedSecretsV3Response
 	response, err := httpClient.
 		R().
 		SetResult(&secretsResponse).
-		SetHeader("User-Agent", config.UserAgent).
+		SetHeader("User-Agent", c.UserAgent).
 		SetBody(request).
-		Patch(fmt.Sprintf("%v/v3/secrets/%s", config.HostApiUrl, request.SecretName))
+		Patch(fmt.Sprintf("%v/v3/secrets/%s", c.BaseUrl, request.SecretName))
 
 	if err != nil {
 		return fmt.Errorf("CallUpdateSecretsV3: Unable to complete api request [err=%s]", err)
@@ -108,14 +108,14 @@ func UpdateSecretsV3(httpClient *resty.Client, request models.UpdateSecretByName
 	return nil
 }
 
-func GetSingleSecretByNameV3(httpClient *resty.Client, request models.CreateSecretV3Request, config models.ApiConfig) error {
+func (c *ClientConfig) GetSingleSecretByNameV3(httpClient *resty.Client, request models.CreateSecretV3Request) error {
 	var secretsResponse models.GetEncryptedSecretsV3Response
 	response, err := httpClient.
 		R().
 		SetResult(&secretsResponse).
-		SetHeader("User-Agent", config.UserAgent).
+		SetHeader("User-Agent", c.UserAgent).
 		SetBody(request).
-		Post(fmt.Sprintf("%v/v3/secrets/%s", config.HostApiUrl, request.SecretName))
+		Post(fmt.Sprintf("%v/v3/secrets/%s", c.BaseUrl, request.SecretName))
 
 	if err != nil {
 		return fmt.Errorf("CallGetSingleSecretByNameV3: Unable to complete api request [err=%s]", err)

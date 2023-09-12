@@ -7,8 +7,8 @@ An api client for go applications to interact with infisical's api.
 ```go
 // Example req - Get a User's Encrypted WorkSpace Key
 import (
-	"github.com/infisical/go-client"
-	"github.com/infisical/go-client/models"
+	"github.com/infisical/go-client/api/models"
+	"github.com/infisical/go-client/api"
 	)
 
 // Create resty client
@@ -24,12 +24,12 @@ request := models.GetEncryptedWorkspaceKeyRequest{
 }
 
 // configure Api Call for cli
-config := models.ApiConfig{
+client := api.ClientConfig{
     UserAgent: "cli"
-    HostApiUrl: "https://app.infisical.com/api" // default, use self-hosted instance if any
+    BaseUrl: "https://app.infisical.com/api" // default, use self-hosted instance if any
 }
 
-workspaceKeyResponse, err := client.GetEncryptedWorkspaceKey(httpClient, request, config)
+workspaceKeyResponse, err := client.GetEncryptedWorkspaceKey(httpClient, request)
 if err != nil {
 	return fmt.Errorf("unable to get your encrypted workspace key. [err=%v]", err)
 }
@@ -47,12 +47,12 @@ httpClient.SetAuthToken(serviceToken).
 	SetHeader("Accept", "application/json")
 
 // configure Api Call for k8-operator
-config := models.ApiConfig{
+client := api.ClientConfig{
     UserAgent: "k8-operator"
-    HostApiUrl: "https://app.infisical.com/api" // default, use self-hosted instance if any
+    BaseUrl: "https://app.infisical.com/api" // default, use self-hosted instance if any
 }
 
-serviceTokenDetails, err := client.GetServiceTokenDetailsV2(httpClient, config)
+serviceTokenDetails, err := client.GetServiceTokenDetailsV2(httpClient)
 if err != nil {
 	return fmt.Errorf("unable to get service token details. [err=%v]", err)
 }
@@ -72,12 +72,12 @@ httpClient.SetAuthToken(userLoggedInDetails.JTWToken).
 request := models.GetAccessibleEnvironmentsRequest{WorkspaceId: workspaceId}
 
 // configure Api Call for terraform
-config := models.ApiConfig{
+client := api.ClientConfig{
     UserAgent: "terraform"
     HostApiUrl: "https://app.infisical.com/api" // default, use self-hosted instance if any
 }
 
-response, err := client.GetAccessibleEnvironments(httpClient, request,config)
+response, err := client.GetAccessibleEnvironments(httpClient, request)
 if err != nil {
 	return err
 }
@@ -98,12 +98,12 @@ request := models.GetEncryptedSecretsV3Request{
 	}
 
 // configure Api Call for terraform
-config := models.ApiConfig{
+client := api.ClientConfig{
     UserAgent: "terraform"
     HostApiUrl: "https://app.infisical.com/api" // default, use self-hosted instance if any
 }
 
-encryptedSecrets, err := client.GetSecretsV3(httpClient, request, config)
+encryptedSecrets, err := client.GetSecretsV3(httpClient, request)
 if err != nil {
 	return nil, nil, err
 }

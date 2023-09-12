@@ -1,6 +1,6 @@
 // Provides support cryptography functions
 // for interacting with the infisical api service
-package client
+package incrypto
 
 import (
 	"crypto/aes"
@@ -8,7 +8,7 @@ import (
 	"crypto/rand"
 	"io"
 
-	"github.com/quinton11/go-client/models"
+	"github.com/quinton11/go-client/core/crypto/models"
 
 	"golang.org/x/crypto/nacl/box"
 )

@@ -5,20 +5,29 @@ package client
 import (
 	"fmt"
 
-	"github.com/quinton11/go-client/models"
+	"github.com/quinton11/go-client/api/models"
 
 	"net/http"
 
 	"github.com/go-resty/resty/v2"
 )
 
-func GetServiceTokenDetailsV2(httpClient *resty.Client, config models.ApiConfig) (models.GetServiceTokenDetailsResponse, error) {
+type ClientConfig struct {
+	UserAgent string `json:"UserAgent"`
+	BaseUrl   string `json:"BaseUrl"`
+}
+
+func NewClient(userAgent string, hostUrl string) *ClientConfig {
+	return &ClientConfig{UserAgent: userAgent, BaseUrl: hostUrl}
+}
+
+func (c *ClientConfig) GetServiceTokenDetailsV2(httpClient *resty.Client) (models.GetServiceTokenDetailsResponse, error) {
 	var tokenDetailsResponse models.GetServiceTokenDetailsResponse
 	response, err := httpClient.
 		R().
 		SetResult(&tokenDetailsResponse).
-		SetHeader("User-Agent", config.UserAgent).
-		Get(fmt.Sprintf("%v/v2/service-token", config.HostApiUrl))
+		SetHeader("User-Agent", c.UserAgent).
+		Get(fmt.Sprintf("%v/v2/service-token", c.BaseUrl))
 
 	if err != nil {
 		return models.GetServiceTokenDetailsResponse{}, fmt.Errorf("CallGetServiceTokenDetails: Unable to complete api request [err=%s]", err)
@@ -31,13 +40,13 @@ func GetServiceTokenDetailsV2(httpClient *resty.Client, config models.ApiConfig)
 	return tokenDetailsResponse, nil
 }
 
-func GetServiceTokenAccountDetailsV2(httpClient *resty.Client, config models.ApiConfig) (models.ServiceAccountDetailsResponse, error) {
+func (c *ClientConfig) GetServiceTokenAccountDetailsV2(httpClient *resty.Client) (models.ServiceAccountDetailsResponse, error) {
 	var serviceAccountDetailsResponse models.ServiceAccountDetailsResponse
 	response, err := httpClient.
 		R().
 		SetResult(&serviceAccountDetailsResponse).
-		SetHeader("User-Agent", config.UserAgent).
-		Get(fmt.Sprintf("%v/v2/service-accounts/me", config.HostApiUrl))
+		SetHeader("User-Agent", c.UserAgent).
+		Get(fmt.Sprintf("%v/v2/service-accounts/me", c.BaseUrl))
 
 	if err != nil {
 		return models.ServiceAccountDetailsResponse{}, fmt.Errorf("CallGetServiceTokenAccountDetailsV2: Unable to complete api request [err=%s]", err)
@@ -50,14 +59,14 @@ func GetServiceTokenAccountDetailsV2(httpClient *resty.Client, config models.Api
 	return serviceAccountDetailsResponse, nil
 }
 
-func Login1V2(httpClient *resty.Client, request models.GetLoginOneV2Request, config models.ApiConfig) (models.GetLoginOneV2Response, error) {
+func (c *ClientConfig) Login1V2(httpClient *resty.Client, request models.GetLoginOneV2Request) (models.GetLoginOneV2Response, error) {
 	var loginOneV2Response models.GetLoginOneV2Response
 	response, err := httpClient.
 		R().
 		SetResult(&loginOneV2Response).
-		SetHeader("User-Agent", config.UserAgent).
+		SetHeader("User-Agent", c.UserAgent).
 		SetBody(request).
-		Post(fmt.Sprintf("%v/v3/auth/login1", config.HostApiUrl))
+		Post(fmt.Sprintf("%v/v3/auth/login1", c.BaseUrl))
 
 	if err != nil {
 		return models.GetLoginOneV2Response{}, fmt.Errorf("CallLogin1V3: Unable to complete api request [err=%s]", err)
@@ -70,16 +79,16 @@ func Login1V2(httpClient *resty.Client, request models.GetLoginOneV2Request, con
 	return loginOneV2Response, nil
 }
 
-func VerifyMFAToken(httpClient *resty.Client, request models.VerifyMfaTokenRequest, config models.ApiConfig) (*models.VerifyMfaTokenResponse, *models.VerifyMfaTokenErrorResponse, error) {
+func (c *ClientConfig) VerifyMFAToken(httpClient *resty.Client, request models.VerifyMfaTokenRequest) (*models.VerifyMfaTokenResponse, *models.VerifyMfaTokenErrorResponse, error) {
 	var verifyMfaTokenResponse models.VerifyMfaTokenResponse
 	var responseError models.VerifyMfaTokenErrorResponse
 	response, err := httpClient.
 		R().
 		SetResult(&verifyMfaTokenResponse).
-		SetHeader("User-Agent", config.UserAgent).
+		SetHeader("User-Agent", c.UserAgent).
 		SetError(&responseError).
 		SetBody(request).
-		Post(fmt.Sprintf("%v/v2/auth/mfa/verify", config.HostApiUrl))
+		Post(fmt.Sprintf("%v/v2/auth/mfa/verify", c.BaseUrl))
 
 	cookies := response.Cookies()
 
@@ -108,14 +117,14 @@ func VerifyMFAToken(httpClient *resty.Client, request models.VerifyMfaTokenReque
 	return &verifyMfaTokenResponse, nil, nil
 }
 
-func Login2V2(httpClient *resty.Client, request models.GetLoginTwoV2Request, config models.ApiConfig) (models.GetLoginTwoV2Response, error) {
+func (c *ClientConfig) Login2V2(httpClient *resty.Client, request models.GetLoginTwoV2Request) (models.GetLoginTwoV2Response, error) {
 	var loginTwoV2Response models.GetLoginTwoV2Response
 	response, err := httpClient.
 		R().
 		SetResult(&loginTwoV2Response).
-		SetHeader("User-Agent", config.UserAgent).
+		SetHeader("User-Agent", c.UserAgent).
 		SetBody(request).
-		Post(fmt.Sprintf("%v/v3/auth/login2", config.HostApiUrl))
+		Post(fmt.Sprintf("%v/v3/auth/login2", c.BaseUrl))
 
 	cookies := response.Cookies()
 
@@ -146,13 +155,13 @@ func Login2V2(httpClient *resty.Client, request models.GetLoginTwoV2Request, con
 
 // Checks if the attached JWToken is still valid.
 // Set the http client's Auth Token with the user's JWT before passing
-func IsAuthenticated(httpClient *resty.Client, config models.ApiConfig) bool {
+func (c *ClientConfig) IsAuthenticated(httpClient *resty.Client) bool {
 	var workSpacesResponse models.GetWorkSpacesResponse
 	response, err := httpClient.
 		R().
 		SetResult(&workSpacesResponse).
-		SetHeader("User-Agent", config.UserAgent).
-		Post(fmt.Sprintf("%v/v1/auth/checkAuth", config.HostApiUrl))
+		SetHeader("User-Agent", c.UserAgent).
+		Post(fmt.Sprintf("%v/v1/auth/checkAuth", c.BaseUrl))
 
 	if err != nil {
 		return false
@@ -165,17 +174,17 @@ func IsAuthenticated(httpClient *resty.Client, config models.ApiConfig) bool {
 	return true
 }
 
-func GetNewAccessTokenWithRefreshToken(httpClient *resty.Client, refreshToken string, config models.ApiConfig) (models.GetNewAccessTokenWithRefreshTokenResponse, error) {
+func (c *ClientConfig) GetNewAccessTokenWithRefreshToken(httpClient *resty.Client, refreshToken string) (models.GetNewAccessTokenWithRefreshTokenResponse, error) {
 	var newAccessToken models.GetNewAccessTokenWithRefreshTokenResponse
 	response, err := httpClient.
 		R().
 		SetResult(&newAccessToken).
-		SetHeader("User-Agent", config.UserAgent).
+		SetHeader("User-Agent", c.UserAgent).
 		SetCookie(&http.Cookie{
 			Name:  "jid",
 			Value: refreshToken,
 		}).
-		Post(fmt.Sprintf("%v/v1/auth/token", config.HostApiUrl))
+		Post(fmt.Sprintf("%v/v1/auth/token", c.BaseUrl))
 
 	if err != nil {
 		return models.GetNewAccessTokenWithRefreshTokenResponse{}, err
@@ -188,13 +197,13 @@ func GetNewAccessTokenWithRefreshToken(httpClient *resty.Client, refreshToken st
 	return newAccessToken, nil
 }
 
-func GetServiceAccountKeysV2(httpClient *resty.Client, request models.GetServiceAccountKeysRequest, config models.ApiConfig) (models.GetServiceAccountKeysResponse, error) {
+func (c *ClientConfig) GetServiceAccountKeysV2(httpClient *resty.Client, request models.GetServiceAccountKeysRequest) (models.GetServiceAccountKeysResponse, error) {
 	var serviceAccountKeysResponse models.GetServiceAccountKeysResponse
 	response, err := httpClient.
 		R().
 		SetResult(&serviceAccountKeysResponse).
-		SetHeader("User-Agent", config.UserAgent).
-		Get(fmt.Sprintf("%v/v2/service-accounts/%v/keys", config.HostApiUrl, request.ServiceAccountId))
+		SetHeader("User-Agent", c.UserAgent).
+		Get(fmt.Sprintf("%v/v2/service-accounts/%v/keys", c.BaseUrl, request.ServiceAccountId))
 
 	if err != nil {
 		return models.GetServiceAccountKeysResponse{}, fmt.Errorf("CallGetServiceAccountKeysV2: Unable to complete api request [err=%s]", err)
