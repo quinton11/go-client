@@ -1,6 +1,6 @@
 // Package client provides api functions as a client
 // to interact with the infisical api service
-package client
+package api
 
 import (
 	"fmt"

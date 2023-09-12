@@ -1,4 +1,4 @@
-package client
+package api
 
 import (
 	"github.com/quinton11/go-client/api/models"
